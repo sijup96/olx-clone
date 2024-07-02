@@ -1,14 +1,17 @@
 import { useEffect, useState } from 'react'
 import SearchIcon from '../assets/SearchIcon';
 import ArrowIcon from '../assets/ArrowIcon';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { onAuthStateChanged, signOut } from 'firebase/auth';
 import { auth } from '../config/firebase';
 import UserComponent from './UserComponent';
+import Swal from 'sweetalert2';
 
 const Header = () => {
   const [loggedIn, setLoggedIn] = useState<boolean>(false)
   const [userName, setUserName] = useState<string>('')
+
+  const navigate = useNavigate()
   useEffect(() => {
     const userInfo = onAuthStateChanged(auth, (user) => {
       if (user) {
@@ -19,8 +22,34 @@ const Header = () => {
     return () => userInfo()
   }, [])
   const signOutUser = () => {
-    signOut(auth).then(() => setLoggedIn(!loggedIn)).catch((error) => { console.error(error); }
-    )
+    Swal.fire({
+      title: 'Are you sure?',
+      text: 'You will be logged out!',
+      icon: 'warning',
+      showCancelButton: true,
+      confirmButtonText: 'Yes, sign me out!',
+      cancelButtonText: 'No, cancel!',
+    }).then((result) => {
+      if (result.isConfirmed) {
+        signOut(auth)
+          .then(() => {
+            setLoggedIn(false); // Update state after successful sign-out
+          })
+          .catch((error) => {
+            console.error('Error signing out:', error);
+          });
+      } else if (result.dismiss === Swal.DismissReason.cancel) {
+        Swal.fire('Cancelled', 'You are still logged in :)', 'error');
+      }
+    });
+  };
+
+  const handleSell = () => {
+    if (loggedIn) {
+      navigate('/sell')
+    } else {
+      navigate('/login')
+    }
   }
   return (
     <>
@@ -72,13 +101,10 @@ const Header = () => {
               </Link>
             )}
           </div>
-          <div className="flex items-center">
-            <Link
-              to="/sale-product"
-              className="font-bold text-md  rounded-3xl bg-white py-1 px-3  border-blue-500 border-solid border-4"
-            >
+          <div className="flex items-center cursor-pointer" onClick={handleSell}>
+            <span className="font-bold text-md  rounded-3xl bg-white py-1 px-3  border-blue-500 border-solid border-4">
               +SELL
-            </Link>
+            </span>
           </div>
         </div>
       </div>
