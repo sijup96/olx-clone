@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import ProductCard from './ProductCard'
 import { collection, getDocs } from 'firebase/firestore'
 import { db } from '../config/firebase'
+import Shimmer from './Shimmer';
 
 interface ProductType {
   id: string;
@@ -30,7 +31,7 @@ const Products = () => {
     }
   }
 
-  return (
+  return products?.length === 0 ? (<Shimmer />) : (
     <div className='mx-auto w-9/12 '>
       <div className='text-2xl text-blue-900 p-3 ml-5'>Fresh Recomendations</div>
       <div className=' grid grid-cols-4 p-5'>

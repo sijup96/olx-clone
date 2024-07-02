@@ -61,10 +61,10 @@ const Login = () => {
     }
 
     return (
-        <div className='flex justify-center items-center h-screen bg-black bg-opacity-50' >
+        <div className='flex justify-center items-center h-screen bg-black bg-opacity-50 ' >
             <div className='w-1/4'>
-                <div className='p-5 bg-white flex flex-col '>
-                    <div className='flex items-center justify-center'>
+                <div className='p-5 bg-white flex flex-col rounded-md'>
+                    <div className='flex items-center justify-center '>
                         <img src="https://logos-world.net/wp-content/uploads/2022/04/OLX-Symbol.png" className='w-9/12 ' alt="logo" />
                     </div>
                     <div>
