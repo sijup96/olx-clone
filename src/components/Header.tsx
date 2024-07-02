@@ -33,7 +33,7 @@ const Header = () => {
       if (result.isConfirmed) {
         signOut(auth)
           .then(() => {
-            setLoggedIn(false); // Update state after successful sign-out
+            setLoggedIn(false);
           })
           .catch((error) => {
             console.error('Error signing out:', error);
@@ -51,18 +51,19 @@ const Header = () => {
       navigate('/login')
     }
   }
+  const goHome=()=>{
+    navigate('/')
+  }
   return (
     <>
       <div className="px-2.5 py-4 bg-cyan-50">
         <div className="bg-cyan-50 flex relative items-center px-5 justify-between">
-
           <img
-            className="w-12 h-7"
+            className="w-12 h-7 cursor-pointer"
             src="https://logos-world.net/wp-content/uploads/2022/04/OLX-Symbol.png"
             alt="olx_logo"
+            onClick={goHome}
           />
-
-
           <div className="flex h-10 items-center space-x-4 bg-white">
             <SearchIcon />
             <input

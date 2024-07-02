@@ -31,7 +31,7 @@ const Products = () => {
   }
 
   return (
-    <div>
+    <div className='mx-auto w-9/12 '>
       <div className='text-2xl text-blue-900 p-3 ml-5'>Fresh Recomendations</div>
       <div className=' grid grid-cols-4 p-5'>
         {products.map((product) => <ProductCard key={product.id} product={product} />)}

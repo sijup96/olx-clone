@@ -47,7 +47,7 @@ const SellProduct = () => {
         if (productImage)
           await uploadBytes(fileRef, productImage)
         const downloadedURL = await getDownloadURL(fileRef)
-        await addDoc(collection(db, 'Products'), {
+        await addDoc(collection(db, 'products'), {
           productName: productName,
           category: category,
           price: price,
