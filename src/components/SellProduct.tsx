@@ -1,11 +1,19 @@
 import React, { useRef, useState } from 'react'
 import productValidate from '../utils/productValidate'
 import PhotoIcon from '../assets/PhotoIcon'
+import { onAuthStateChanged } from 'firebase/auth'
+import { auth, db } from '../config/firebase'
+import { useNavigate } from 'react-router-dom'
+import { getDownloadURL, getStorage, ref, uploadBytes } from 'firebase/storage'
+import { addDoc, collection } from 'firebase/firestore'
 
 
 const SellProduct = () => {
   const [error, setError] = useState<string[]>([])
   const [displayImage, setDisplayImage] = useState<string | null>(null)
+  const [productImage, setProductImage] = useState<File | null>(null)
+
+  const navigate = useNavigate()
 
   const productNameRef = useRef<HTMLInputElement>(null)
   const categoryRef = useRef<HTMLInputElement>(null)
@@ -14,6 +22,7 @@ const SellProduct = () => {
   const handlePhoto = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
     if (file) {
+      setProductImage(file)
       const imageURL = URL.createObjectURL(file)
       setDisplayImage(imageURL)
     }
@@ -23,8 +32,34 @@ const SellProduct = () => {
     const productName = productNameRef.current?.value || ''
     const category = categoryRef.current?.value || ''
     const price = parseFloat(priceRef.current?.value || '0')
-    const errorMessage = productValidate({ productName, category, price })
+    const image = productImage
+    const errorMessage = productValidate({ productName, category, price, image })
     setError(errorMessage)
+    if (error.length > 0) return
+    onAuthStateChanged(auth, async (user) => {
+      if (!user) {
+        navigate('/login')
+      } else {
+        const uid = user.uid
+        const storage = getStorage()
+        const filePath = 'images/' + productName
+        const fileRef = ref(storage, filePath)
+        if (productImage)
+          await uploadBytes(fileRef, productImage)
+        const downloadedURL = await getDownloadURL(fileRef)
+        await addDoc(collection(db, 'Products'), {
+          productName: productName,
+          category: category,
+          price: price,
+          uid: uid,
+          url: downloadedURL
+        }).then(() => {
+          navigate('/')
+        })
+          .catch(error => console.log(error))
+
+      }
+    })
   }
 
   return (
