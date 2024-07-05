@@ -27,7 +27,6 @@ const Products = () => {
       setProducts(productsList)
     } catch (error) {
       console.error(error);
-
     }
   }
 

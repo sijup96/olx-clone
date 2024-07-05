@@ -3,11 +3,11 @@ import { checkValidData } from '../utils/validate'
 import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth, db } from '../config/firebase'
 import { doc, setDoc } from 'firebase/firestore'
-import { useNavigate } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 
 const Login = () => {
     const [isSignInForm, setIsSignInForm] = useState(true)
-    const [error, setError] = useState<string | null>(null)
+    const [errors, setErrors] = useState<string[]>([])
 
     const navigate = useNavigate()
 
@@ -19,9 +19,9 @@ const Login = () => {
     const handleButtonClick = async () => {
         const email = emailRef.current?.value || ''
         const password = passwordRef.current?.value || ''
-        const message = checkValidData({ email, password })
-        if (message) {
-            setError(message)
+        const error = checkValidData({ email, password })
+        if (error.length) {
+            setErrors(error)
             return
         }
         if (!isSignInForm) {
@@ -50,7 +50,7 @@ const Login = () => {
                 await signInWithEmailAndPassword(auth, email, password)
                 navigate('/')
             } catch (error) {
-                setError('other')
+                setErrors(['other'])
             }
         }
 
@@ -64,6 +64,8 @@ const Login = () => {
         <div className='flex justify-center items-center h-screen bg-black bg-opacity-50 ' >
             <div className='w-1/4'>
                 <div className='p-5 bg-white flex flex-col rounded-md'>
+                <Link to={'/'}><h1 className='cursor-pointer text-end text-2xl'>X</h1></Link>
+
                     <div className='flex items-center justify-center '>
                         <img src="https://logos-world.net/wp-content/uploads/2022/04/OLX-Symbol.png" className='w-9/12 ' alt="logo" />
                     </div>
@@ -76,16 +78,16 @@ const Login = () => {
                             )}
                             <p className='mt-5'>Email address</p>
                             <input type="text" className='mt-5 p-2' placeholder='email' ref={emailRef} />
-                            {error === 'email' &&
+                            {errors.includes('email') &&
                                 <p className='text-red-600'>Please enter a valid email</p>}
                             <p className='mt-5'>Password</p>
                             <input className='mt-5 p-2' type="password" placeholder='password' ref={passwordRef} />
-                            {error === 'password' &&
-                                <p className='text-red-600'>Please enter a valid password</p>}
+                            {errors.includes('password') &&(
+                                <p className='text-red-600'>Please enter a valid password</p>)}
                             <div className=' flex flex-col items-center mt-5 justify-center'>
                                 <button className=' bg-green-950 w-20 rounded-lg p-2 font-bold text-white' onClick={handleButtonClick}>
                                     {isSignInForm ? 'Sign In' : 'Sign Up'}</button>
-                                {error === 'other' &&
+                                {errors.includes('other') &&
                                     <p className='text-red-600 mt-5'>Invalid credentials</p>}
                             </div>
 
