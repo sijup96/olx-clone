@@ -1,6 +1,6 @@
-import { useRef, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import { checkValidData } from '../utils/validate'
-import { createUserWithEmailAndPassword, signInWithEmailAndPassword, updateProfile } from 'firebase/auth'
+import { createUserWithEmailAndPassword, onAuthStateChanged, signInWithEmailAndPassword, updateProfile } from 'firebase/auth'
 import { auth, db } from '../config/firebase'
 import { doc, setDoc } from 'firebase/firestore'
 import { Link, useNavigate } from 'react-router-dom'
@@ -15,6 +15,13 @@ const Login = () => {
     const emailRef = useRef<HTMLInputElement>(null)
     const passwordRef = useRef<HTMLInputElement>(null)
 
+    useEffect(()=>{
+      const unSubscribe=onAuthStateChanged(auth,(user)=>{
+        if(user)
+            navigate('/')
+        return unSubscribe()
+      })          
+    },[])
 
     const handleButtonClick = async () => {
         const email = emailRef.current?.value || ''
